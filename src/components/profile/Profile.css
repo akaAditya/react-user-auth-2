@@ -1,0 +1,38 @@
+.profile-div {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px;
+}
+
+.profile-heading {
+  background-color: rgb(214, 115, 115);
+  border-radius: 5px;
+  padding: 5px;
+}
+.contact-div {
+  margin-left: 50%;
+  margin-right: 15px;
+}
+.contact-heading {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-cancel {
+  width: 70px;
+  height: 30px;
+  margin-top: 10px;
+  background-color: rgb(177, 76, 76);
+    border: none;
+    border-radius: 5px;
+    color: white;
+}
+.btn-submit{
+    width: 70px;
+    height: 30px;
+    margin-top: 10px;
+    background-color: rgb(48, 126, 32);
+      border: none;
+      border-radius: 5px;
+      color: white;
+}

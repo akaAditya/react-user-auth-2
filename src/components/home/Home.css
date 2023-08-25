@@ -1,0 +1,12 @@
+.home-div{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.profile-heading{
+    background-color: rgb(214, 115, 115);
+    border-radius: 5px;
+    padding: 5px;
+    
+}

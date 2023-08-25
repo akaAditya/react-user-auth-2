@@ -4,6 +4,7 @@ import {BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Home from './components/home/Home';
 import AuthContext from './authStore/auth-context';
 import UserAuth from './components/signUp/UserAuth';
+import Profile from './components/profile/Profile';
 
 
 function App() {
@@ -19,6 +20,9 @@ function App() {
       </Route>
       <Route path='/home'>
         <Home />
+      </Route>
+      <Route path='/profile'>
+        <Profile />
       </Route>
     </Switch>
     </Router>
