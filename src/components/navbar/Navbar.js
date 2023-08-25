@@ -23,6 +23,9 @@ const Navbar = () => {
       <div className="about">
         <Link to='/aboutUs'>About-Us</Link>
       </div>
+      <div className="auth">
+        <Link to='/auth'>Register</Link>
+      </div>
       </div>
       </nav>
     </div>
