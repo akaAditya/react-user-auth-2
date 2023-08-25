@@ -26,7 +26,7 @@ const UserAuth = () => {
         eneteredPassword === confirmPasswordInput.current.value
       ) {
         await fetch(
-          `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCedCWGFgq0burWoy-SLWzy8D-H-FOQADU`,
+          `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDLiJAA2nnB-WBprrLUliC8uFhlF8Wlnck`,
           {
             method: "POST",
             body: JSON.stringify({
@@ -40,12 +40,10 @@ const UserAuth = () => {
             },
           }
         );
-        console.log("Successfully user account created");
-
         throw new Error("Something went wrong, try again");
       } else if (!haveAccount) {
         await fetch(
-          `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCedCWGFgq0burWoy-SLWzy8D-H-FOQADU`,
+          `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDLiJAA2nnB-WBprrLUliC8uFhlF8Wlnck`,
           {
             method: "POST",
             body: JSON.stringify({
@@ -68,6 +66,7 @@ const UserAuth = () => {
           })
           .then((data) => {
             authContext.Login(data.idToken);
+            authContext.LocalID(data.localId);
             history.replace("/home");
           })
           .catch((err) => err);

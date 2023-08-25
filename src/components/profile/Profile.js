@@ -1,28 +1,60 @@
-import React, { useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Profile.css";
+import AuthContext from "../../authStore/auth-context";
 
 const Profile = () => {
-    const userFullName = useRef();
-    const userProfileURL = useRef();
-    const formSubmitHandler = async (event)=>{
-        event.preventDefault()
-        const eneteredFullName = userFullName.current.value;
-        const enteredProfileURL = userProfileURL.current.value;
+  const authContext = useContext(AuthContext);
+  const userFullName = useRef("");
+  const userProfileURL = useRef("");
 
-        await fetch('https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyCedCWGFgq0burWoy-SLWzy8D-H-FOQADU',{
-            method: 'POST',
-            body : JSON.stringify({
-                fullName : eneteredFullName,
-                profileURL : enteredProfileURL,
-                returnSecureToken : true
-            }),
-            headers : {
-                'Content-Type' : 'application/json'
-            }
-        }).then(res=>console.log(res.json()))
-        console.log('Details submitted successfully')
-    }
+  const [name, setName] = useState("");
+  const [photo, setPhoto] = useState("");
+
+  const formSubmitHandler = async (event) => {
+    event.preventDefault();
+    const eneteredFullName = userFullName.current.value;
+    const enteredProfileURL = userProfileURL.current.value;
+    setName(authContext.profile[0].displayName);
+    setPhoto(authContext.profile[0].photoUrl)
+
+    await fetch(
+      "https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyDLiJAA2nnB-WBprrLUliC8uFhlF8Wlnck",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          idToken: authContext.token,
+          displayName: eneteredFullName,
+          photoUrl: enteredProfileURL,
+          returnSecureToken: true,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((res) => console.log(res.json()));
+  };
+
+  // UseEffect
+  useEffect(() => {
+    fetch(
+      "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyDLiJAA2nnB-WBprrLUliC8uFhlF8Wlnck",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          idToken: authContext.token,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((res) => authContext.ProfileData(res.users));
+  }, []);
+  //   console.log(authContext.profile[0].displayName)
+  //   console.log(authContext.profile[0].photoUrl)
+
   return (
     <div>
       <div className="profile-div">
@@ -41,11 +73,14 @@ const Profile = () => {
         </div>
         <form onSubmit={formSubmitHandler}>
           <label>Full Name: </label>
-          <input type="text" ref={userFullName}/>
+          <input type="text" id="fname" ref={userFullName} />
           <label>Profile Photo URL: </label>
-          <input type="text" ref={userProfileURL}/>
+          <input type="text" id="photoUrl" ref={userProfileURL} />
           <button className="btn-submit">Submit</button>
         </form>
+        <div>
+          {name} And {photo}
+        </div>
       </div>
       <hr />
     </div>
