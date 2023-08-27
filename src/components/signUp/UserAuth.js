@@ -79,46 +79,55 @@ const UserAuth = () => {
   return (
     <React.Fragment>
       <div className="container">
-        <form className="form" onSubmit={submitHandler}>
-          <label>Email</label>
-          <input
-            type="text"
-            id="email"
-            name="email"
-            placeholder="your email"
-            ref={emailInput}
-            required
-          />
-          <br />
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            placeholder="your password"
-            ref={passwordInput}
-            required
-          />
-          <br />
-          {haveAccount && (
-            <div>
-              <label>Confirm Password</label>
+        <div className="div-container">
+          <form className="form" onSubmit={submitHandler}>
+            <h1 style={{color: 'orangered'}}>{haveAccount ? "Sign Up" : "Login"}</h1>
+            <div className="email-psw">
+              <label className="email-label">Email</label>
+              <input
+                type="text"
+                id="email-input"
+                name="email"
+                placeholder="your email"
+                ref={emailInput}
+                required
+              />
+              <br />
+              <label className="password-label">Password</label>
               <input
                 type="password"
-                name="password"
-                placeholder="confirm password"
-                ref={confirmPasswordInput}
+                id="password-input"
+                name="password-input"
+                placeholder="your password"
+                ref={passwordInput}
+                required
               />
+            
+
+            <br />
+            {haveAccount && (
+              <div className="confirm-psw-div">
+                <label className="password-label">Confirm Password</label>
+                <input
+                  type="password"
+                  id="password-input"
+                  name="password"
+                  placeholder="confirm password"
+                  ref={confirmPasswordInput}
+                />
+              </div>
+            )}
             </div>
-          )}
-          <br />
-          <button>{!haveAccount ? "Sign In" : "Sign Up"}</button>
-          <div className="signIn">
-            {haveAccount ? "Already have account?" : "Don't have an account?"}
-            <button onClick={userAuthHandler}>
-              {!haveAccount ? "Sign Up" : "Sign In"}
-            </button>
-          </div>
-        </form>
+            <br />
+            <button className="btn-submit-form">{!haveAccount ? "Sign In" : "Sign Up"}</button>
+            <div className="signIn">
+              {haveAccount ? "Already have account?   " : "Don't have an account?   "}
+              <button className="btn-change-form" onClick={userAuthHandler}>
+                {!haveAccount ? "Sign Up" : "Sign In"}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </React.Fragment>
   );
