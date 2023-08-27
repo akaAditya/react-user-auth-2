@@ -8,8 +8,8 @@ const Profile = () => {
   const userFullName = useRef("");
   const userProfileURL = useRef("");
 
-  const [name, setName] = useState("");
-  const [photo, setPhoto] = useState("");
+  // const [name, setName] = useState("");
+  // const [photo, setPhoto] = useState("");
 
   const verifyEmailIdHandler = async () => {
     try {
@@ -32,8 +32,8 @@ const Profile = () => {
     event.preventDefault();
     const eneteredFullName = userFullName.current.value;
     const enteredProfileURL = userProfileURL.current.value;
-    setName(authContext.profile[0].displayName);
-    setPhoto(authContext.profile[0].photoUrl);
+    // setName(authContext.profile[0].displayName);
+    // setPhoto(authContext.profile[0].photoUrl);
 
     await fetch(
       "https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyDLiJAA2nnB-WBprrLUliC8uFhlF8Wlnck",

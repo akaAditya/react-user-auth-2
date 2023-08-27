@@ -7,17 +7,6 @@ import { Redirect, useHistory } from "react-router-dom/cjs/react-router-dom.min"
 
 const Navbar = () => {
   const authContext = useContext(AuthContext);
-  const history = useHistory();
-  const [logout, setLogout] = useState(false);
-
-  const userSignOutHandler = () => {
-    setLogout((prev)=>!prev)
-    authContext.Logout();
-    history.replace("/auth");
-    return (
-      <Redirect to='/auth'/>
-    )
-  };
   return (
     <div>
       <nav className="nav">
@@ -40,7 +29,7 @@ const Navbar = () => {
             <Link to="/auth">Register</Link>
           </div>
           <div>
-            <button className="btn-logout" onClick={userSignOutHandler}>
+            <button className="btn-logout" onClick={()=> authContext.Logout()}>
               Sign Out
             </button>
           </div>

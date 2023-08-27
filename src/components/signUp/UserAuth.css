@@ -73,3 +73,13 @@
     padding: 10px;
     color: green;
 }
+
+.btn-forgot-pass{
+  background-color: rgb(70, 75, 9);
+  width: 100px;
+  height: 40px;
+  color: rgb(219, 195, 195);
+  font-weight: 700;
+  border: none;
+  border-radius: 15px;
+}

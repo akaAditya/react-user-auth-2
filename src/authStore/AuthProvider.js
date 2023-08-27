@@ -15,6 +15,7 @@ const AuthProvider = (props) => {
         localStorage.setItem('token', token)
     }
     const logoutHandler = () =>{
+      setToken(null)
       localStorage.removeItem('token', token)
   }
 

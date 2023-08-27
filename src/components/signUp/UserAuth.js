@@ -4,7 +4,7 @@ import AuthContext from "../../authStore/auth-context";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 const UserAuth = () => {
-  const [haveAccount, setHaveAccount] = useState(true);
+  const [haveAccount, setHaveAccount] = useState(false);
   const history = useHistory();
   const authContext = useContext(AuthContext);
   const emailInput = useRef();
@@ -15,6 +15,22 @@ const UserAuth = () => {
     setHaveAccount((prev) => !prev);
   };
 
+  const userForgotPasswordHandler = async () => {
+    const fetchEmailInput = emailInput.current.value;
+    await fetch(
+      "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyDLiJAA2nnB-WBprrLUliC8uFhlF8Wlnck",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          requestType: "PASSWORD_RESET",
+          email: fetchEmailInput,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((res)=>console.log(res.json())).catch((err)=>console.log('EMAIL_NOT_FOUND', err));
+  };
   const submitHandler = async (event) => {
     event.preventDefault();
     const eneteredEmail = emailInput.current.value;
@@ -81,7 +97,9 @@ const UserAuth = () => {
       <div className="container">
         <div className="div-container">
           <form className="form" onSubmit={submitHandler}>
-            <h1 style={{color: 'orangered'}}>{haveAccount ? "Sign Up" : "Login"}</h1>
+            <h1 style={{ color: "orangered" }}>
+              {haveAccount ? "Sign Up" : "Login"}
+            </h1>
             <div className="email-psw">
               <label className="email-label">Email</label>
               <input
@@ -100,30 +118,41 @@ const UserAuth = () => {
                 name="password-input"
                 placeholder="your password"
                 ref={passwordInput}
-                required
+                
               />
-            
 
-            <br />
-            {haveAccount && (
-              <div className="confirm-psw-div">
-                <label className="password-label">Confirm Password</label>
-                <input
-                  type="password"
-                  id="confirm-password-input"
-                  name="password"
-                  placeholder="confirm password"
-                  ref={confirmPasswordInput}
-                />
-              </div>
-            )}
+              <br />
+              {haveAccount && (
+                <div className="confirm-psw-div">
+                  <label className="password-label">Confirm Password</label>
+                  <input
+                    type="password"
+                    id="confirm-password-input"
+                    name="password"
+                    placeholder="confirm password"
+                    ref={confirmPasswordInput}
+                  />
+                </div>
+              )}
             </div>
             <br />
-            <button className="btn-submit-form">{!haveAccount ? "Sign In" : "Sign Up"}</button>
+            <button className="btn-submit-form">
+              {!haveAccount ? "Sign In" : "Sign Up"}
+            </button>
             <div className="signIn">
-              {haveAccount ? "Already have account?   " : "Don't have an account?   "}
+              {haveAccount
+                ? "Already have account?   "
+                : "Don't have an account?   "}
               <button className="btn-change-form" onClick={userAuthHandler}>
                 {!haveAccount ? "Sign Up" : "Sign In"}
+              </button>
+            </div>
+            <div>
+              <button
+                className="btn-forgot-pass"
+                onClick={userForgotPasswordHandler}
+              >
+                Forgot Password
               </button>
             </div>
           </form>
