@@ -110,7 +110,7 @@ const UserAuth = () => {
                 <label className="password-label">Confirm Password</label>
                 <input
                   type="password"
-                  id="password-input"
+                  id="confirm-password-input"
                   name="password"
                   placeholder="confirm password"
                   ref={confirmPasswordInput}

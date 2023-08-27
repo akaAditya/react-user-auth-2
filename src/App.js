@@ -5,6 +5,7 @@ import Home from './components/home/Home';
 import AuthContext from './authStore/auth-context';
 import UserAuth from './components/signUp/UserAuth';
 import Profile from './components/profile/Profile';
+import { Redirect } from 'react-router-dom/cjs/react-router-dom.min';
 
 
 function App() {
@@ -17,8 +18,9 @@ function App() {
       <Route path='/auth'>
         {!authContext.loggedIn && <UserAuth />}
         {authContext.loggedIn && <Home />}
+        {!authContext.loggedIn && <Redirect to='/auth'/>}
       </Route>
-      <Route path='/home'>
+      <Route path='/'>
         <Home />
       </Route>
       <Route path='/profile'>

@@ -14,6 +14,9 @@ const AuthProvider = (props) => {
         setToken(token);
         localStorage.setItem('token', token)
     }
+    const logoutHandler = () =>{
+      localStorage.removeItem('token', token)
+  }
 
     const profileDatahandler = (data)=>{
       setProfileData(data)
@@ -28,6 +31,7 @@ const AuthProvider = (props) => {
         localId : localId,
         loggedIn : isLoggedIn,
         Login : loginHandler,
+        Logout : logoutHandler,
         LocalID: localIdHandler,
         ProfileData : profileDatahandler
     }
