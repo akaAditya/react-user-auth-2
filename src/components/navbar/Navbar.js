@@ -1,9 +1,8 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import "./Navbar.css";
 import { Link } from "react-router-dom";
 import iconImage from "F:/ReactJS/user-authentication-part-2/src/assets/iconImg.png";
 import AuthContext from "../../authStore/auth-context";
-import { Redirect, useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 const Navbar = () => {
   const authContext = useContext(AuthContext);
@@ -17,10 +16,10 @@ const Navbar = () => {
         </div>
         <div className="headers">
           <div className="home">
-            <Link to="/">Home</Link>
+            <Link to="/home">Home</Link>
           </div>
-          <div className="product">
-            <Link to="/products">Products</Link>
+          <div className="expenses">
+            <Link to="/expense">Expense</Link>
           </div>
           <div className="about">
             <Link to="/aboutUs">About-Us</Link>

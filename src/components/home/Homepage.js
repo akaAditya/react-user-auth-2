@@ -2,7 +2,7 @@ import React from 'react'
 
 const Homepage = () => {
   return (
-    <div style={{fontSize: '100px'}}>Welcome to Expense Tracker</div>
+    <div style={{fontSize: '80px'}}>Welcome to Expense Tracker</div>
   )
 }
 

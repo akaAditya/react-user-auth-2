@@ -7,6 +7,7 @@ import UserAuth from "./components/signUp/UserAuth";
 import Profile from "./components/profile/Profile";
 import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
 import Homepage from "./components/home/Homepage";
+import Expenses from "./components/expenses/Expenses";
 
 function App() {
   const authContext = useContext(AuthContext);
@@ -21,12 +22,16 @@ function App() {
             {!authContext.loggedIn && <Redirect to="/auth" />}
           </Route>
           <Route path="/auth">
-            <UserAuth />
+            {!authContext.loggedIn && <UserAuth />}
+            {authContext.loggedIn && <p>You are logged in</p>}
           </Route>
           <Route path="/profile">
             {authContext.loggedIn && <Profile />}
             {!authContext.loggedIn && <Redirect to="/auth" />}
             
+          </Route>
+          <Route path='/expense'>
+            <Expenses />
           </Route>
           <Route path="/">
             <Homepage />
