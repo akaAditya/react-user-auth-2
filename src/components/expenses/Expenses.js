@@ -1,29 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./Expenses.css";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { expenseActions } from "../../store/expense-slice";
 
 const Expenses = () => {
-  // const [expenses, setExpenses] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [select, setSelect] = useState();
-  const [selectUpdate, setSelectUpdate] = useState();
   const [data, setData] = useState([]);
-  // const [updateData, setUpdateData] = useState([]);
-  const [expenseId, setExpenseId] = useState(null);
-  const [show, setShow] = useState(false);
+  const [showUpdate, setShowUpdate] = useState(false);
+  const [tempId, setTempId] = useState("");
+  const [showPremiumButton, setShowPremiumButton] = useState(false);
+
+  const dispatch = useDispatch();
 
   const inputMoney = useRef();
   const inputDescription = useRef();
-  // const inputDropDown = useRef();
 
-  const updateMoney = useRef();
-  const updateDescription = useRef();
-  // const updateDropDown = useRef();
-
-  // const addExpenseHandler = (expense) => {
-  //   return setExpenses((prev) => [expense, ...prev]);
-  // };
+  const addExpenseHandler = (expense) => {
+    return setExpenses((prev) => [...prev, expense]);
+  };
 
   const options = [
+    { label: "Select", id: 0 },
     { label: "Daily needs", id: 1 },
     { label: "Petrol", id: 2 },
     { label: "Bills", id: 3 },
@@ -31,29 +30,20 @@ const Expenses = () => {
   const handleSelect = (event) => {
     setSelect(event.target.value);
   };
-  const handleUpdateSelect = (event)=>{
-    setSelectUpdate(event.target.value)
-  }
-  const showEditForm = (id) => {
-    setShow(true);
-    const elementId = id;
-    setExpenseId(elementId);
-  };
 
-  const submitExpenseFormHandler = async (event) => {
+  const postExpenseHandler = async (event) => {
     event.preventDefault();
     const enteredInputMoney = inputMoney.current.value;
     const enteredInputDescription = inputDescription.current.value;
-    // const enteredInputDropDown = inputDropDown.current.value;
 
-    // const expenseData = {
-    //   money: enteredInputMoney,
-    //   description: enteredInputDescription,
-    //   expenseOn: select,
-    // };
-    // addExpenseHandler(expenseData);
+    const expenseData = {
+      money: enteredInputMoney,
+      description: enteredInputDescription,
+      expenseOn: select,
+    };
+    addExpenseHandler(expenseData);
     try {
-       await axios(
+      await axios(
         "https://react-authentication-part2-default-rtdb.firebaseio.com/expenses.json",
         {
           method: "POST",
@@ -67,7 +57,6 @@ const Expenses = () => {
           },
         }
       );
-      // const data = postResponse.data;
       let errorMessage = "Response is not working";
       throw new Error(errorMessage);
     } catch (err) {
@@ -91,10 +80,22 @@ const Expenses = () => {
       ).then((res) => setData(res.data));
     } catch {}
   }, []);
-  // const dataKey = Object.entries(data);
-  // const res = dataKey.map((key) => {
-  //   return key[0];
-  // });
+
+  Object.entries(data).map((exp) => {
+    dispatch(expenseActions.expenses(exp[1].description));
+    dispatch(expenseActions.expenses(exp[1].money));
+    dispatch(expenseActions.expenses(exp[1].expenseOn));
+  });
+
+  useEffect(() => {
+    let sumOfMoney = 0;
+    window.onload = Object.entries(data).map((exp) => {
+      sumOfMoney += Number(exp[1].money);
+    });
+    if (sumOfMoney >= 10000) {
+      setShowPremiumButton(true);
+    }
+  }, [data]);
 
   const expenseDeleteHandler = async (id) => {
     await axios.delete(
@@ -103,55 +104,72 @@ const Expenses = () => {
     console.log("successfully expense deleted");
   };
 
-  const expenseUpdateHandler = async () => {
-    console.log(expenseId, "from expenseID update handler");
+  const handleUpdate = (id) => {
+    setShowUpdate(true);
+    setTempId(id);
+  };
 
-    const enteredInputMoney = updateMoney.current.value;
-    const enteredInputDescription = updateDescription.current.value;
-    // const enteredInputDropDown = updateDropDown.current.value;
+  const expenseUpdateHandler = async () => {
+    const enteredInputMoney = inputMoney.current.value;
+    const enteredInputDescription = inputDescription.current.value;
+
     try {
-      const response = await fetch(
-        `https://react-authentication-part2-default-rtdb.firebaseio.com/expenses/${expenseId}.json`,
+      await fetch(
+        `https://react-authentication-part2-default-rtdb.firebaseio.com/expenses/${tempId}.json`,
         {
           method: "PUT",
-          data: JSON.stringify({
-            description: enteredInputDescription,
-            money: enteredInputMoney,
-            expenseOn: selectUpdate,
-          }),
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            description: enteredInputDescription,
+            money: enteredInputMoney,
+            expenseOn: select,
+          }),
         }
-      )
-      console.log(response.json(), 'getting reesponse')
+      );
     } catch (err) {
       console.log(err);
     }
+    setShowUpdate(false);
+    inputMoney.current.value = "";
+    inputDescription.current.value = "";
+    setSelect("");
   };
 
   return (
     <div>
       <div>
-        {!show && (
-          <form className="expense-form" onSubmit={submitExpenseFormHandler}>
-            <label className="money-label">Spent Money</label>
-            <input type="number" id="money" ref={inputMoney} />
-            <label>Description</label>
-            <input type="text" ref={inputDescription} />
-            <select onChange={handleSelect} value={select}>
-              {options.map((option) => (
-                <option value={option.label} key={option.id}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <button>Add Expenses</button>
-          </form>
+        <label className="money-label">Spent Money</label>
+        <input type="number" id="money" ref={inputMoney} />
+        <label>Description</label>
+        <input type="text" ref={inputDescription} />
+        <select onChange={handleSelect} value={select}>
+          {options.map((option) => (
+            <option value={option.label} key={option.id}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        {showUpdate ? (
+          <>
+            <button onClick={expenseUpdateHandler}>Update Expense</button>
+            <button onClick={() => setShowUpdate(false)}>X</button>
+          </>
+        ) : (
+          <button onClick={postExpenseHandler}>Add Expenses</button>
         )}
       </div>
       <div>
         <>
+          {expenses.map((expense) => (
+            <ul>
+              <li key={Math.random().toString()}>
+                {expense.money} - {expense.description} - {expense.expenseOn} -
+                <button>Delete</button>-<button>Edit</button>
+              </li>
+            </ul>
+          ))}
           {Object.entries(data).map((expense) => (
             <ul className="expenses-list" key={Math.random().toString()}>
               <li>
@@ -160,38 +178,13 @@ const Expenses = () => {
                 <button onClick={() => expenseDeleteHandler(expense[0])}>
                   Delete
                 </button>
-                -<button onClick={() => showEditForm(expense[0])}>Edit</button>
+                -<button onClick={() => handleUpdate(expense[0])}>Edit</button>
               </li>
-              {/* <li>{expense.description}</li>
-              <li>{expense.expenseOn}</li> */}
             </ul>
           ))}
         </>
       </div>
-      {/* <div>{!show && <UpdateExpense id={expenseId} />}</div> */}
-      <div>
-        {show && (
-          <form
-            className="expense-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              expenseUpdateHandler();
-            }}
-          >
-            <label className="money-label">Spent Money</label>
-            <input type="number" id="money" ref={updateMoney} />
-            <label>Description</label>
-            <input type="text" ref={updateDescription} />
-            <select onChange={handleUpdateSelect} value={selectUpdate}>
-              {/* <option disabled>Select</option> */}
-              <option value="Daily needs">Daily Needs</option>
-              <option value="Petrol">Petrol</option>
-              <option value="Bills">Bills</option>
-            </select>
-            <input type="submit" value='Update'/>
-          </form>
-        )}
-      </div>
+      <div>{showPremiumButton && <button>Premium</button>}</div>
     </div>
   );
 };

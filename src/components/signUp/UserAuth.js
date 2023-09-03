@@ -1,15 +1,18 @@
-import React, { useContext, useRef, useState } from "react";
+import React, {  useRef, useState } from "react";
 import "./UserAuth.css";
-import AuthContext from "../../authStore/auth-context";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { useDispatch } from "react-redux";
+import { authActions } from "../../store/auth-slice";
 
 const UserAuth = () => {
   const [haveAccount, setHaveAccount] = useState(false);
   const history = useHistory();
-  const authContext = useContext(AuthContext);
+  // const authContext = useContext(AuthContext);
   const emailInput = useRef();
   const passwordInput = useRef();
   const confirmPasswordInput = useRef();
+
+  const dispatch = useDispatch();
 
   const userAuthHandler = () => {
     setHaveAccount((prev) => !prev);
@@ -81,8 +84,9 @@ const UserAuth = () => {
             }
           })
           .then((data) => {
-            authContext.Login(data.idToken);
-            authContext.LocalID(data.localId);
+            // authContext.Login(data.idToken);
+            // authContext.LocalID(data.localId);
+            dispatch(authActions.login(data.idToken))
             history.replace("/home");
           })
           .catch((err) => err);
