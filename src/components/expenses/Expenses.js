@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./Expenses.css";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { expenseActions } from "../../store/expense-slice";
+import { themeActions } from "../../store/theme-slice";
+import DownloadLink from "react-download-link";
 
 const Expenses = () => {
   const [expenses, setExpenses] = useState([]);
@@ -12,7 +14,12 @@ const Expenses = () => {
   const [tempId, setTempId] = useState("");
   const [showPremiumButton, setShowPremiumButton] = useState(false);
 
+  // Theme light/dark
   const dispatch = useDispatch();
+  // const darkMode = useSelector((state) => state.theme.darkMode);
+  const themeChangeHandler = () => {
+    dispatch(themeActions());
+  };
 
   const inputMoney = useRef();
   const inputDescription = useRef();
@@ -81,11 +88,19 @@ const Expenses = () => {
     } catch {}
   }, []);
 
+  let downloadData;
   Object.entries(data).map((exp) => {
     dispatch(expenseActions.expenses(exp[1].description));
     dispatch(expenseActions.expenses(exp[1].money));
     dispatch(expenseActions.expenses(exp[1].expenseOn));
+
+    downloadData = {
+      description: exp[1].description,
+      money: exp[1].money,
+      expenseOn: exp[1].expenseOn
+    }
   });
+  console.log(downloadData)
 
   useEffect(() => {
     let sumOfMoney = 0;
@@ -184,7 +199,15 @@ const Expenses = () => {
           ))}
         </>
       </div>
-      <div>{showPremiumButton && <button>Premium</button>}</div>
+            <DownloadLink label='Save Expenses' filename="myExpenses.csv" exportFile={()=> downloadData} />
+      <div>
+        
+      </div>
+      <div>
+        {showPremiumButton && (
+          <button onClick={themeChangeHandler}>Premium</button>
+        )}
+      </div>
     </div>
   );
 };
