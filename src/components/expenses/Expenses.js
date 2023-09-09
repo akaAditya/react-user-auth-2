@@ -1,32 +1,39 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import "./Expenses.css";
 import axios from "axios";
+import exportFromJSON from "export-from-json";
 import { useDispatch, useSelector } from "react-redux";
 import { expenseActions } from "../../store/expense-slice";
+import DarkMode from "../UI/DarkMode";
 import { themeActions } from "../../store/theme-slice";
-import DownloadLink from "react-download-link";
+import AuthContext from "../../authStore/auth-context";
 
 const Expenses = () => {
-  const [expenses, setExpenses] = useState([]);
+  const authContext = useContext(AuthContext);
+  // const [expenses, setExpenses] = useState([]);
   const [select, setSelect] = useState();
   const [data, setData] = useState([]);
   const [showUpdate, setShowUpdate] = useState(false);
   const [tempId, setTempId] = useState("");
   const [showPremiumButton, setShowPremiumButton] = useState(false);
-
-  // Theme light/dark
   const dispatch = useDispatch();
-  // const darkMode = useSelector((state) => state.theme.darkMode);
-  const themeChangeHandler = () => {
-    dispatch(themeActions());
+  const dark = useSelector((state) => state.darkMode.isDark);
+
+  const email = authContext.email;
+  const removeAt = email.replace("@", "");
+  const removeDot = removeAt.replace(".", "");
+  const finalEmail = removeDot;
+
+  const ChangeThemeColor = () => {
+    dispatch(themeActions.toggleTheme());
   };
 
   const inputMoney = useRef();
   const inputDescription = useRef();
 
-  const addExpenseHandler = (expense) => {
-    return setExpenses((prev) => [...prev, expense]);
-  };
+  // const addExpenseHandler = (expense) => {
+    // return setExpenses((prev) => [...prev, expense]);
+  // };
 
   const options = [
     { label: "Select", id: 0 },
@@ -48,10 +55,11 @@ const Expenses = () => {
       description: enteredInputDescription,
       expenseOn: select,
     };
-    addExpenseHandler(expenseData);
+    // addExpenseHandler(expenseData);
+    dispatch(expenseActions.addExpenses(expenseData));
     try {
       await axios(
-        "https://react-authentication-part2-default-rtdb.firebaseio.com/expenses.json",
+        `https://react-authentication-part2-default-rtdb.firebaseio.com/expenses${finalEmail}.json`,
         {
           method: "POST",
           data: JSON.stringify({
@@ -63,21 +71,15 @@ const Expenses = () => {
             "Content-Type": "application/json",
           },
         }
-      );
+      ).then((res) => setData(res.data));
       let errorMessage = "Response is not working";
       throw new Error(errorMessage);
     } catch (err) {
       console.log(err);
     }
-
-    inputMoney.current.value = "";
-    inputDescription.current.value = "";
-    setSelect("");
-  };
-  useEffect(() => {
     try {
       window.onload = axios(
-        "https://react-authentication-part2-default-rtdb.firebaseio.com/expenses.json",
+        `https://react-authentication-part2-default-rtdb.firebaseio.com/expenses${finalEmail}.json`,
         {
           method: "GET",
           headers: {
@@ -86,37 +88,111 @@ const Expenses = () => {
         }
       ).then((res) => setData(res.data));
     } catch {}
-  }, []);
 
-  let downloadData;
+    inputMoney.current.value = "";
+    inputDescription.current.value = "";
+    setSelect("");
+    // dispatch(
+    //   expenseActions.replaceCart({
+    //     items: data.items || [],
+    //   }))
+  };
+  useEffect(() => {
+    // if(data.length>0){
+
+    try {
+      window.onload = axios(
+        `https://react-authentication-part2-default-rtdb.firebaseio.com/expenses${finalEmail}.json`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      ).then((res) => 
+      // console.log(res.data)
+      // setData(res.data)
+      {
+        if (!res.ok && res.data !== null) {
+          return setData(res.data);
+        } 
+        else {
+          return setData([]);
+        }
+      }
+      );
+    } catch {}
+    // }
+  }, [finalEmail]);
+
+  // Download Data
+  const downloadData = [];
   Object.entries(data).map((exp) => {
-    dispatch(expenseActions.expenses(exp[1].description));
-    dispatch(expenseActions.expenses(exp[1].money));
-    dispatch(expenseActions.expenses(exp[1].expenseOn));
+    dispatch(
+      expenseActions.addExpenses({
+        id: exp[0],
+        description: exp[1].description,
+        money: exp[1].money,
+        expenseOn: exp[1].expenseOn,
+      })
+    );
+    // console.log(expenseActions.addExpenses(), 'expenses from exp')
 
-    downloadData = {
+    return downloadData.push({
       description: exp[1].description,
       money: exp[1].money,
-      expenseOn: exp[1].expenseOn
-    }
+      expenseOn: exp[1].expenseOn,
+    });
   });
-  console.log(downloadData)
+  const downloadExpensesHandler = (data) => {
+    const fileName = "myExpenses";
+    const exportType = exportFromJSON.types.csv;
+    exportFromJSON({ data, fileName, exportType });
+  };
 
   useEffect(() => {
     let sumOfMoney = 0;
-    window.onload = Object.entries(data).map((exp) => {
+    Object.entries(data).map((exp) => {
       sumOfMoney += Number(exp[1].money);
+      return sumOfMoney;
     });
     if (sumOfMoney >= 10000) {
-      setShowPremiumButton(true);
+      return setShowPremiumButton(true);
     }
   }, [data]);
 
   const expenseDeleteHandler = async (id) => {
-    await axios.delete(
-      `https://react-authentication-part2-default-rtdb.firebaseio.com/expenses/${id}.json`
-    );
+    // dispatch(expenseActions.removeExpenses(id))
+    // console.log(expenseActions.removeExpenses(id))
+    try {
+      await axios.delete(
+        `https://react-authentication-part2-default-rtdb.firebaseio.com/expenses${finalEmail}/${id}.json`
+      );
+    } catch {}
+
     console.log("successfully expense deleted");
+    try {
+      window.onload = await axios(
+        `https://react-authentication-part2-default-rtdb.firebaseio.com/expenses${finalEmail}.json`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      ).then((res) => {
+        if (!res.ok && res.data !== null) {
+          return setData(res.data);
+        } 
+        else {
+          return setData([]);
+        }
+      });
+    } catch {}
+    // dispatch(
+    //   expenseActions.replaceCart({
+    //     items: [] || data,
+    //   }))
   };
 
   const handleUpdate = (id) => {
@@ -130,7 +206,7 @@ const Expenses = () => {
 
     try {
       await fetch(
-        `https://react-authentication-part2-default-rtdb.firebaseio.com/expenses/${tempId}.json`,
+        `https://react-authentication-part2-default-rtdb.firebaseio.com/expenses${finalEmail}/${tempId}.json`,
         {
           method: "PUT",
           headers: {
@@ -150,41 +226,67 @@ const Expenses = () => {
     inputMoney.current.value = "";
     inputDescription.current.value = "";
     setSelect("");
+    try {
+      window.onload = axios(
+        `https://react-authentication-part2-default-rtdb.firebaseio.com/expenses${finalEmail}.json`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      ).then((res) => setData(res.data));
+    } catch {}
+    // dispatch(
+    //   expenseActions.replaceCart({
+    //     items: data || [],
+    //   }))
   };
 
   return (
-    <div>
+    <div
+      className="form-data"
+      style={{
+        backgroundColor: dark ? "rgb(44, 40, 40)" : "white",
+        color: dark ? "rgb(150, 131, 131)" : "black",
+        height: "100vh",
+      }}
+    >
       <div>
-        <label className="money-label">Spent Money</label>
-        <input type="number" id="money" ref={inputMoney} />
-        <label>Description</label>
-        <input type="text" ref={inputDescription} />
-        <select onChange={handleSelect} value={select}>
-          {options.map((option) => (
-            <option value={option.label} key={option.id}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        {showUpdate ? (
-          <>
-            <button onClick={expenseUpdateHandler}>Update Expense</button>
-            <button onClick={() => setShowUpdate(false)}>X</button>
-          </>
-        ) : (
-          <button onClick={postExpenseHandler}>Add Expenses</button>
-        )}
+        <button className="mode" onClick={ChangeThemeColor}>
+          Mode
+        </button>
+      </div>
+      <div className="form-data1">
+        <div className="form-data2">
+          <label className="money-label">Spent Money</label>
+          <input type="number" id="money" ref={inputMoney} />
+          <label>Description</label>
+          <input type="text" ref={inputDescription} />
+          <select onChange={handleSelect} value={select}>
+            {options.map((option) => (
+              <option value={option.label} key={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          {showUpdate ? (
+            <>
+              <button onClick={expenseUpdateHandler}>Update Expense</button>
+              <button
+                onClick={() => setShowUpdate(false)}
+                style={{ marginTop: "5px", backgroundColor: "red" }}
+              >
+                X
+              </button>
+            </>
+          ) : (
+            <button onClick={postExpenseHandler}>Add Expenses</button>
+          )}
+        </div>
       </div>
       <div>
         <>
-          {expenses.map((expense) => (
-            <ul>
-              <li key={Math.random().toString()}>
-                {expense.money} - {expense.description} - {expense.expenseOn} -
-                <button>Delete</button>-<button>Edit</button>
-              </li>
-            </ul>
-          ))}
           {Object.entries(data).map((expense) => (
             <ul className="expenses-list" key={Math.random().toString()}>
               <li>
@@ -199,15 +301,25 @@ const Expenses = () => {
           ))}
         </>
       </div>
-            <DownloadLink label='Save Expenses' filename="myExpenses.csv" exportFile={()=> downloadData} />
       <div>
-        
+        <button
+          style={{
+            marginTop: "20px",
+            marginLeft: "20%",
+            width: "120px",
+            height: "30px",
+            backgroundColor: "rgb(161, 56, 37)",
+            border: "none",
+            borderRadius: "10px",
+            cursor: "pointer",
+            color: "white",
+          }}
+          onClick={() => downloadExpensesHandler(downloadData)}
+        >
+          Download
+        </button>
       </div>
-      <div>
-        {showPremiumButton && (
-          <button onClick={themeChangeHandler}>Premium</button>
-        )}
-      </div>
+      <div>{showPremiumButton && <DarkMode />}</div>
     </div>
   );
 };

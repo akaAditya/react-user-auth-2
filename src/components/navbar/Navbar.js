@@ -1,15 +1,19 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./Navbar.css";
 import { Link } from "react-router-dom";
 import iconImage from "F:/ReactJS/user-authentication-part-2/src/assets/iconImg.png";
 import { useDispatch } from "react-redux";
 import { authActions } from "../../store/auth-slice";
+import AuthContext from "../../authStore/auth-context";
 
 const Navbar = () => {
+  const authContext = useContext(AuthContext);
   const dispatch = useDispatch();
   const logoutHandler = (event) => {
     event.preventDefault();
     dispatch(authActions.logout());
+    authContext.Logout()
+
   };
   return (
     <div>
@@ -34,7 +38,8 @@ const Navbar = () => {
           </div>
           <div>
             <button className="btn-logout" onClick={logoutHandler}>
-              Sign Out
+            <Link to='/auth'>Sign Out</Link>
+              
             </button>
           </div>
         </div>

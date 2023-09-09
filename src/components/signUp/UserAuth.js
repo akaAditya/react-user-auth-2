@@ -1,13 +1,15 @@
-import React, {  useRef, useState } from "react";
+import React, {  useContext, useRef, useState } from "react";
 import "./UserAuth.css";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { useDispatch } from "react-redux";
 import { authActions } from "../../store/auth-slice";
+import AuthContext from "../../authStore/auth-context";
+import { emailActions } from "../../store/email-store";
 
 const UserAuth = () => {
   const [haveAccount, setHaveAccount] = useState(false);
   const history = useHistory();
-  // const authContext = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
   const emailInput = useRef();
   const passwordInput = useRef();
   const confirmPasswordInput = useRef();
@@ -58,7 +60,10 @@ const UserAuth = () => {
               "Content-Type": "application/json",
             },
           }
-        );
+        ).then((data)=>{
+          history.replace("/expense");
+          
+        })
         throw new Error("Something went wrong, try again");
       } else if (!haveAccount) {
         await fetch(
@@ -84,10 +89,12 @@ const UserAuth = () => {
             }
           })
           .then((data) => {
-            // authContext.Login(data.idToken);
+            authContext.Login(data.idToken);
             // authContext.LocalID(data.localId);
+            authContext.emailStore(data.email)
+            dispatch(emailActions.addEmail(data.email))
             dispatch(authActions.login(data.idToken))
-            history.replace("/home");
+            history.replace("/expense");
           })
           .catch((err) => err);
       } else {
