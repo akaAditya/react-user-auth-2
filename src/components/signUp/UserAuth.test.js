@@ -49,4 +49,70 @@ test('test forgot password', ()=>{
     const outputElement = screen.getByText('Forgot Password', {exact: false});
     expect(outputElement).toBeInTheDocument()
 })
+
+//Async 
+test("render signUp credentials", async () => {
+    window.fetch = jest.fn();
+    window.fetch.mockResolvedValueOnce({
+      json: async () => [
+        {
+          id: "#1",
+          email: 'test@jest.com',
+          password: "123@123#",
+          confirmPassword: "123@123#",
+        },
+      ],
+    });
+    render(<UserAuth />);
+    const listsignUpElements = await screen.findAllByRole('form');
+    expect(listsignUpElements).not.toHaveLength(0);
+  });
+
+  test("render signIn right credentials", async () => {
+    window.fetch = jest.fn();
+    window.fetch.mockResolvedValueOnce({
+      json: async () => [
+        {
+          id: "#1",
+          email: 'test@jest.com',
+          password: "123@123#",
+        },
+      ],
+    });
+    render(<UserAuth />);
+    const listsignInElements = await screen.findAllByRole('form');
+    expect(listsignInElements).not.toHaveLength(0);
+  });
+
+  test("render signIn wrong credentials", async () => {
+    window.fetch = jest.fn();
+    window.fetch.mockResolvedValueOnce({
+      json: async () => [
+        {
+          id: "#1",
+          email: 'test1#jest.com',
+          password: "@123123#",
+        },
+      ],
+    });
+    render(<UserAuth />);
+    const listsignInWithWrongElements = await screen.findAllByRole('form');
+    expect(listsignInWithWrongElements).not.toHaveLength(0);
+  });
+
+  test("render signIn wrong credentials", async () => {
+    window.fetch = jest.fn();
+    window.fetch.mockResolvedValueOnce({
+      json: async () => [
+        {
+          id: "#1",
+          email: 'testjest@__.com_',
+          password: "abc!232@",
+        },
+      ],
+    });
+    render(<UserAuth />);
+    const listsignInWithWrongElements = await screen.findAllByRole('form');
+    expect(listsignInWithWrongElements).not.toHaveLength(0);
+  });
 });
