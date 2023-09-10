@@ -6,6 +6,7 @@ const emailSlice = createSlice({
     reducers: {
         addEmail(state, action) {
             state.email = action.payload;
+            localStorage.setItem('email', state.email);
         }
     }
 })
