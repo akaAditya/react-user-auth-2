@@ -90,7 +90,6 @@ const UserAuth = () => {
           })
           .then((data) => {
             authContext.Login(data.idToken);
-            // authContext.LocalID(data.localId);
             authContext.emailStore(data.email)
             dispatch(emailActions.addEmail(data.email))
             dispatch(authActions.login(data.idToken))
@@ -167,6 +166,10 @@ const UserAuth = () => {
               </button>
             </div>
           </form>
+        </div>
+        <div className="div-container" style={{marginLeft: '15px'}}>
+                <h4>Test user: test@test.com</h4>
+                <h4>Test password: 123456</h4>
         </div>
       </div>
     </React.Fragment>

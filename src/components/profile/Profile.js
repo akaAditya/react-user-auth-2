@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import "./Profile.css";
 import AuthContext from "../../authStore/auth-context";
@@ -7,9 +7,6 @@ const Profile = () => {
   const authContext = useContext(AuthContext);
   const userFullName = useRef("");
   const userProfileURL = useRef("");
-
-  // const [name, setName] = useState("");
-  // const [photo, setPhoto] = useState("");
 
   const verifyEmailIdHandler = async () => {
     try {
@@ -68,9 +65,7 @@ const Profile = () => {
     )
       .then((res) => res.json()).then((data)=>console.log(data))
       .then((res) => authContext.ProfileData(res.users));
-  }, []);
-  //   console.log(authContext.profile[0].displayName)
-  //   console.log(authContext.profile[0].photoUrl)
+  }, [authContext]);
 
   return (
     <div>

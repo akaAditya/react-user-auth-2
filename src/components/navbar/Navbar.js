@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import "./Navbar.css";
 import { Link } from "react-router-dom";
-import iconImage from "F:/ReactJS/user-authentication-part-2/src/assets/iconImg.png";
+import iconImg from "../../assets/iconImg.png";
 import { useDispatch } from "react-redux";
 import { authActions } from "../../store/auth-slice";
 import AuthContext from "../../authStore/auth-context";
@@ -20,25 +20,25 @@ const Navbar = () => {
       <nav className="nav">
         <div>
           <Link to="/">
-            <img src={iconImage} alt="icon" className="icon" />
+            <img src={iconImg} alt="icon" className="icon" />
           </Link>
         </div>
         <div className="headers">
           <div className="home">
-            <Link to="/home">Home</Link>
+            <Link to="/home" style={{textDecoration: 'none', color:'#fff'}}>Home</Link>
           </div>
           <div className="expenses">
-            <Link to="/expense">Expense</Link>
+            <Link to="/expense" style={{textDecoration: 'none', color:'#fff'}}>Expense</Link>
           </div>
           <div className="about">
-            <Link to="/aboutUs">About-Us</Link>
+            <Link to="/aboutUs" style={{textDecoration: 'none', color:'#fff'}}>About-Us</Link>
           </div>
           <div className="auth">
-            <Link to="/auth">Register</Link>
+            <Link to="/auth" style={{textDecoration: 'none', color:'#fff'}}>Register</Link>
           </div>
           <div>
             <button className="btn-logout" onClick={logoutHandler}>
-            <Link to='/auth'>Sign Out</Link>
+            <Link to='/auth' style={{textDecoration: 'none', color:'#fff'}}>Sign Out</Link>
               
             </button>
           </div>
